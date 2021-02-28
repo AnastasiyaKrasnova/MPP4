@@ -2,6 +2,7 @@ const router=require('express').Router();
 const Task=require('../controllers/tasks');
 const fs = require('fs');
 const path = require('path');
+var siofu = require("socketio-file-upload")
 const auth=require('../middleware/verifyToken')
 
 
@@ -159,6 +160,7 @@ exports.delete_Task=(socket)=>{
 exports.create_Task=(socket)=>{
 
      socket.on("create_task", function (note, callback) {
+          console.log("Creating")
           Task.add(note)
           .then((saved)=>{
                if (!saved) {
@@ -187,4 +189,40 @@ exports.update_Task=(socket)=>{
                }
           })
      })
+}
+
+exports.upload_File=(socket)=>{
+
+     socket.on("upload_files", function (id, callback) {
+          try{
+               const dir=`${global.appRoot}/public/${id}`
+               if (!fs.existsSync(dir)){
+                    fs.mkdirSync(dir);
+               }
+               var uploader = new siofu();
+               uploader.dir = dir;
+               uploader.listen(socket);
+               callback({statusCode:'200', result: true});
+          }
+          catch{
+               callback({statusCode:'400', msg:'Error on file uploading'});
+          }
+          
+     })
+}
+
+exports.download_File=(socket)=>{
+     socket.on("download_file", function(file_data, callback){
+          const dir=`${global.appRoot}/public/${file_data.id}`
+          let filePath = path.resolve(`${dir}/${file_data.filename}`);
+          console.log("Download")
+          fs.readFile(filePath, function(err, buf){
+               if (!err){
+                    callback({statusCode:'200', result: buf});
+               }
+               else{
+                    callback({statusCode:'400', msg:'Error on file uploading'});
+               }
+          });
+     })   
 }

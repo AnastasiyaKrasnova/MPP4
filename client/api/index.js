@@ -1,6 +1,7 @@
 import axios from 'axios';
 import {apiPrefix} from '../../api_config.json';
 import {socket} from '../components/App.jsx';
+const SocketIOFileUpload = require('socketio-file-upload');
 
 export default {
      async loadTasks() {
@@ -17,7 +18,7 @@ export default {
         })
     },
 
-    createTask(note) {
+    createTask(note, files) {
 
         return new Promise((resolve, reject) =>{
             socket.emit("create_task", note, function (data) {
@@ -26,6 +27,16 @@ export default {
                     reject(data.statusCode)
                 }
                 if (data.statusCode==200){
+                    /*socket.emit("get_id", data.result._id, function (data) {
+                        var uploader = new SocketIOFileUpload(socket);
+                        uploader.submitFiles(files)
+                        if (data.statusCode==400){
+                            console.log(data.msg);
+                        }
+                        if (data.statusCode==200){
+                            console.log("Ora")
+                        }
+                      });*/
                     resolve(data.result)
                 }
               });  
@@ -75,12 +86,34 @@ export default {
         })
     },
 
-    uploadFile(formData,id){
-            return axios.post(`${apiPrefix}/tasks/files?id=${id}`, formData);
+    uploadFile(files, id){
+        return new Promise((resolve, reject) =>{
+            socket.emit("upload_files", id, function (data) {
+                var uploader = new SocketIOFileUpload(socket);
+                uploader.submitFiles(files)
+                if (data.statusCode==400){
+                    console.log(data.msg);
+                    reject(data.statusCode)
+                }
+                if (data.statusCode==200){
+                    resolve(data.result)
+                }
+              });
+        })
     },
 
     downloadFile(filename,id){
-        return axios.post(`${apiPrefix}/tasks/download?filename=${filename}&id=${id}`);
+        return new Promise((resolve, reject) =>{
+            socket.emit("download_file", {filename: filename, id: id}, function (data) {
+                if (data.statusCode==400){
+                    console.log(data.msg);
+                    reject(data.statusCode)
+                }
+                if (data.statusCode==200){
+                    resolve(data.result)
+                }
+              });  
+        })
     },
 
     deleteFile(filename,id){

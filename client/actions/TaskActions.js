@@ -29,25 +29,28 @@ const TaskActions = {
     },
 
     createTask(note) {
-        api.createTask(note)
+        var files=note.file
+        note.file=[]
+        api.createTask(note, files)
         .then((res)=>{
-            console.log(note.file)
+            this.uploadFile(files,res._id)
             this.loadTasks()
-            note.file.map((item,i)=>{
-                const formData = new FormData();        
-                formData.append('file', item);
-                api.uploadFile(formData,res.data._id).
-                catch(err =>
-                    console.error(err)
-            );
-            })     
-            
         }).catch(err =>  
             AppDispatcher.dispatch({
             type: Constants.LOAD_TASKS_FAIL,
             error: err.response
         }))
+    },
 
+    uploadFile(files,id){
+        api.uploadFile(files,id)
+        .then(()=>{
+            console.log("Start file loading")
+        }).catch(err =>  
+            AppDispatcher.dispatch({
+            type: Constants.LOAD_TASKS_FAIL,
+            error: err.response
+        }))
     },
 
     deleteTask(noteId) {
@@ -113,8 +116,8 @@ const TaskActions = {
 
     downloadFile(filename,id){
         api.downloadFile(filename,id)
-        .then(res => {
-            download(res.data, filename);
+        .then((res) => {
+            download(res, filename);
         })
         .catch(err => {
             AppDispatcher.dispatch({
