@@ -191,7 +191,7 @@ exports.update_Task=(socket)=>{
      })
 }
 
-exports.upload_File=(socket)=>{
+exports.upload_File=(socket, uploader)=>{
 
      socket.on("upload_files", function (id, callback) {
           try{
@@ -199,9 +199,7 @@ exports.upload_File=(socket)=>{
                if (!fs.existsSync(dir)){
                     fs.mkdirSync(dir);
                }
-               var uploader = new siofu();
                uploader.dir = dir;
-               uploader.listen(socket);
                callback({statusCode:'200', result: true});
           }
           catch{
@@ -221,8 +219,23 @@ exports.download_File=(socket)=>{
                     callback({statusCode:'200', result: buf});
                }
                else{
-                    callback({statusCode:'400', msg:'Error on file uploading'});
+                    callback({statusCode:'500', msg:'File not found'});
                }
           });
      })   
+}
+
+exports.delete_File=(socket)=>{
+     socket.on("delete_file", function(file_data, callback){
+          const dir=`${global.appRoot}/public/${file_data.id}`
+          let filePath = path.resolve(`${dir}/${file_data.filename}`);
+          fs.unlinkSync(filePath, (err) => {
+               if (err){
+                    console.log(err);
+                    callback({statusCode:'500', msg:'File not found'});
+               }    
+          });
+          callback({statusCode:'200', result: true});
+     }) 
+     
 }

@@ -9,7 +9,7 @@ export default {
             socket.emit("load_tasks", function (data) {
                 if (data.statusCode==400){
                     console.log(data.msg);
-                    reject(data.statusCode)
+                    reject(data)
                 }
                 if (data.statusCode==200){
                     resolve(data.result)
@@ -18,25 +18,15 @@ export default {
         })
     },
 
-    createTask(note, files) {
+    createTask(note) {
 
         return new Promise((resolve, reject) =>{
             socket.emit("create_task", note, function (data) {
                 if (data.statusCode==400){
                     console.log(data.msg);
-                    reject(data.statusCode)
+                    reject(data)
                 }
                 if (data.statusCode==200){
-                    /*socket.emit("get_id", data.result._id, function (data) {
-                        var uploader = new SocketIOFileUpload(socket);
-                        uploader.submitFiles(files)
-                        if (data.statusCode==400){
-                            console.log(data.msg);
-                        }
-                        if (data.statusCode==200){
-                            console.log("Ora")
-                        }
-                      });*/
                     resolve(data.result)
                 }
               });  
@@ -48,7 +38,7 @@ export default {
             socket.emit("delete_task", id, function (data) {
                 if (data.statusCode==400){
                     console.log(data.msg);
-                    reject(data.statusCode)
+                    reject(data)
                 }
                 if (data.statusCode==200){
                     resolve(data.result)
@@ -62,7 +52,7 @@ export default {
             socket.emit("filter_tasks", status, function (data) {
                 if (data.statusCode==400){
                     console.log(data.msg);
-                    reject(data.statusCode)
+                    reject(data)
                 }
                 if (data.statusCode==200){
                     resolve(data.result)
@@ -77,7 +67,7 @@ export default {
             socket.emit("update_task", note, function (data) {
                 if (data.statusCode==400){
                     console.log(data.msg);
-                    reject(data.statusCode)
+                    reject(data)
                 }
                 if (data.statusCode==200){
                     resolve(data.result)
@@ -93,7 +83,7 @@ export default {
                 uploader.submitFiles(files)
                 if (data.statusCode==400){
                     console.log(data.msg);
-                    reject(data.statusCode)
+                    reject(data)
                 }
                 if (data.statusCode==200){
                     resolve(data.result)
@@ -105,9 +95,9 @@ export default {
     downloadFile(filename,id){
         return new Promise((resolve, reject) =>{
             socket.emit("download_file", {filename: filename, id: id}, function (data) {
-                if (data.statusCode==400){
+                if (data.statusCode==500){
                     console.log(data.msg);
-                    reject(data.statusCode)
+                    reject(data)
                 }
                 if (data.statusCode==200){
                     resolve(data.result)
@@ -117,7 +107,17 @@ export default {
     },
 
     deleteFile(filename,id){
-        return axios.delete(`${apiPrefix}/tasks/files?filename=${filename}&id=${id}`);
+        return new Promise((resolve, reject) =>{
+            socket.emit("delete_file", {filename: filename, id: id}, function (data) {
+                if (data.statusCode==500){
+                    console.log(data.msg);
+                    reject(data)
+                }
+                if (data.statusCode==200){
+                    resolve(data.result)
+                }
+              });  
+        })
     },
 
     login(user){

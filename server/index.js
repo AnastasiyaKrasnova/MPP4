@@ -48,13 +48,13 @@ io.on("connection", socket => {
     tasks.create_Task(socket)
     tasks.update_Task(socket)
     tasks.filter_Tasks(socket)
-    tasks.upload_File(socket)
+    var uploader = new siofu();
+    uploader.listen(socket); 
+    tasks.upload_File(socket,uploader)
     tasks.download_File(socket)
+    tasks.delete_File(socket)
     socket.on("disconnect", () => console.log("Client disconnected"));
 });
-
-
-
 
 server.listen(serverPort, ()=>console.log('Server is running'));
 

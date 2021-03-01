@@ -21,7 +21,7 @@ const TaskActions = {
         .catch((err) =>{
             AppDispatcher.dispatch({
                 type: Constants.LOAD_TASKS_FAIL,
-                error: err.response
+                error: err
             })
         }
             
@@ -31,14 +31,14 @@ const TaskActions = {
     createTask(note) {
         var files=note.file
         note.file=[]
-        api.createTask(note, files)
+        api.createTask(note)
         .then((res)=>{
             this.uploadFile(files,res._id)
             this.loadTasks()
         }).catch(err =>  
             AppDispatcher.dispatch({
             type: Constants.LOAD_TASKS_FAIL,
-            error: err.response
+            error: err
         }))
     },
 
@@ -49,7 +49,7 @@ const TaskActions = {
         }).catch(err =>  
             AppDispatcher.dispatch({
             type: Constants.LOAD_TASKS_FAIL,
-            error: err.response
+            error: err
         }))
     },
 
@@ -61,32 +61,23 @@ const TaskActions = {
         .catch(err =>
             AppDispatcher.dispatch({
                 type: Constants.LOAD_TASKS_FAIL,
-                error: err.response
+                error: err
             })
         );
     },
 
     updateTask(note) {
-        note.file.map((item,i)=>{
-            const formData = new FormData();        
-            formData.append('file', item);
-            console.log(note)
-            api.uploadFile(formData,note.id)
-            .catch(err =>
-                AppDispatcher.dispatch({
-                    type: Constants.LOAD_TASKS_FAIL,
-                    error: err.response
-                })
-            );
-        })     
+        var files=note.file
+        note.file=[]
         api.updateTask(note)
-        .then(() =>
+        .then(() =>{
+            this.uploadFile(files,note.id)
             this.loadTasks()
-        )
+        })
         .catch(err =>
             AppDispatcher.dispatch({
                 type: Constants.LOAD_TASKS_FAIL,
-                error: err.response
+                error: err
             })
         );
 
@@ -109,7 +100,7 @@ const TaskActions = {
         .catch(err =>
             AppDispatcher.dispatch({
                 type: Constants.LOAD_TASKS_FAIL,
-                error: err.response
+                error: err
             })
         );
     },
@@ -122,7 +113,7 @@ const TaskActions = {
         .catch(err => {
             AppDispatcher.dispatch({
                 type: Constants.LOAD_TASKS_FAIL,
-                error: err.response
+                error: err
             })
         });
     },
@@ -132,7 +123,7 @@ const TaskActions = {
         .catch(err => {
             AppDispatcher.dispatch({
                 type: Constants.LOAD_TASKS_FAIL,
-                error: err.response
+                error: err
             })
         });
     },
@@ -158,7 +149,7 @@ const TaskActions = {
         .catch(err => {
             AppDispatcher.dispatch({
                 type: Constants.LOAD_TASKS_FAIL,
-                error: err.response
+                error: err
             })
         });
     }

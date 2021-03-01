@@ -33,8 +33,8 @@ const TasksStore = Object.assign({}, EventEmitter.prototype, {
     getError() {
         if (_loadingError)
             return {
-                error_status: _loadingError.status,
-                error_text: _loadingError.data
+                error_status: _loadingError.statusCode,
+                error_text: _loadingError.msg
             }
         else
             return{
