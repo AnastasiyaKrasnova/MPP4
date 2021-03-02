@@ -46,7 +46,16 @@ class App extends React.Component{
     }
 
     componentWillMount() {
-        socket = socketIOClient(apiPrefix);
+        const options = {
+            transportOptions: {
+                polling: {
+                    extraHeaders: {
+                        'user_cookie': document.cookie
+                    }
+                }
+            }
+        }
+        socket = socketIOClient(apiPrefix, options);
         socket.on("auth", (err)=>{
             console.log(err)
             TaskActions.authError(err)

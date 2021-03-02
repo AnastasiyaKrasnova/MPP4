@@ -24,7 +24,13 @@ app.use("/static", express.static("public/build"));
 
 
 const server = http.createServer(app);
-const io = socketIo(server);
+const io = socketIo(server)/*, {
+    cookie: {
+      name: "auth-token",
+      httpOnly: true,
+      sameSite: "strict",
+      maxAge: 86400
+    }})*/
 
 const tasks=require('./routes/tasks');
 const users=require('./routes/users');

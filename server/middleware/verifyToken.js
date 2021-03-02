@@ -20,7 +20,6 @@ var cookie = require('cookie');
 }*/
 
 exports.wsTokenVerify=function(socket,packet,next) {
-
     if (packet[0]=="login" || packet[0]=="register"){
         next()
     }
@@ -38,7 +37,7 @@ exports.wsTokenVerify=function(socket,packet,next) {
                 console.log(verified)
                 next();
             }catch(err){
-                next(new Error("Unauthorized"))
+                next(new Error("Invalid token"))
             } 
         }
         else{

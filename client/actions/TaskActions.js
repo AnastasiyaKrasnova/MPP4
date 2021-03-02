@@ -7,10 +7,10 @@ import {Cookies} from "react-cookie";
 
 const TaskActions = {
     loadTasks() {
+        api.checkCookie()
         AppDispatcher.dispatch({
             type: Constants.LOAD_TASKS_REQUEST
         });
-
         api.loadTasks()
         .then((data) =>{
             AppDispatcher.dispatch({
@@ -24,12 +24,11 @@ const TaskActions = {
                 type: Constants.LOAD_TASKS_FAIL,
                 error: err
             })
-        }
-            
-        );
+        });
     },
 
     createTask(note) {
+        api.checkCookie()
         var files=note.file
         note.file=[]
         api.createTask(note)
@@ -44,9 +43,9 @@ const TaskActions = {
     },
 
     uploadFile(files,id){
+        api.checkCookie()
         api.uploadFile(files,id)
         .then(()=>{
-            console.log("Start file loading")
         }).catch(err =>  
             AppDispatcher.dispatch({
             type: Constants.LOAD_TASKS_FAIL,
@@ -55,6 +54,7 @@ const TaskActions = {
     },
 
     deleteTask(noteId) {
+        api.checkCookie()
         api.deleteTask(noteId)
         .then(() =>
             this.loadTasks()
@@ -68,6 +68,7 @@ const TaskActions = {
     },
 
     updateTask(note) {
+        api.checkCookie()
         var files=note.file
         note.file=[]
         api.updateTask(note)
@@ -80,12 +81,11 @@ const TaskActions = {
                 type: Constants.LOAD_TASKS_FAIL,
                 error: err
             })
-        );
-
+        ); 
     },
 
     filterTask(status){
-
+        api.checkCookie()
         AppDispatcher.dispatch({
             type: Constants.LOAD_TASKS_REQUEST
         });
@@ -107,6 +107,7 @@ const TaskActions = {
     },
 
     downloadFile(filename,id){
+        api.checkCookie()
         api.downloadFile(filename,id)
         .then((res) => {
             download(res, filename);
@@ -120,6 +121,7 @@ const TaskActions = {
     },
 
     deleteFile(filename,id){
+        api.checkCookie()
         api.deleteFile(filename,id)
         .catch(err => {
             AppDispatcher.dispatch({

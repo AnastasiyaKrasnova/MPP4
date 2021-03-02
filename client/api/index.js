@@ -1,10 +1,10 @@
-import axios from 'axios';
-import {apiPrefix} from '../../api_config.json';
 import {socket} from '../components/App.jsx';
 const SocketIOFileUpload = require('socketio-file-upload');
 
 export default {
-     async loadTasks() {
+     loadTasks() {
+        /*console.log("Cooookie",document.cookie)
+        console.log(socket.io.engine.opts.transportOptions.polling.extraHeaders)*/
         return new Promise((resolve, reject) =>{
             socket.emit("load_tasks", function (data) {
                 if (data.statusCode==400){
@@ -33,7 +33,7 @@ export default {
         })
     },
 
-    async deleteTask(id) {
+    deleteTask(id) {
         return new Promise((resolve, reject) =>{
             socket.emit("delete_task", id, function (data) {
                 if (data.statusCode==400){
@@ -48,6 +48,7 @@ export default {
     },
 
     filterTask(status){
+        console.log("Cooookie",document.cookie)
         return new Promise((resolve, reject) =>{
             socket.emit("filter_tasks", status, function (data) {
                 if (data.statusCode==400){
@@ -128,15 +129,11 @@ export default {
                     reject(data)
                 }
                 if (data.statusCode==200){
+                    socket.io.engine.opts.transportOptions.polling.extraHeaders.user_cookie="auth-token="+data.result
                     resolve(data.result)
                 }
               });  
         })
-    },
-
-    reconnect(){
-        socket.close()
-        socket.open()
     },
 
 
@@ -152,6 +149,19 @@ export default {
                 }
               });  
         })
+    },
+
+    reconnect(){
+        socket.close()
+        socket.open()
+    },
+
+    checkCookie(){
+        /*console.log("Cooookie",document.cookie)
+        console.log("User",socket.io.engine.opts.transportOptions.polling.extraHeaders.user_cookie)*/
+        if (socket.io.engine.opts.transportOptions.polling.extraHeaders.user_cookie!==document.cookie){
+            this.reconnect() 
+        }
     }
 
 }
