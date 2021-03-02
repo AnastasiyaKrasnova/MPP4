@@ -121,11 +121,37 @@ export default {
     },
 
     login(user){
-        return axios.post(`${apiPrefix}/login`,user);
+        return new Promise((resolve, reject) =>{
+            socket.emit("login", user, function (data) {
+                if (data.statusCode==401){
+                    console.log(data.msg);
+                    reject(data)
+                }
+                if (data.statusCode==200){
+                    resolve(data.result)
+                }
+              });  
+        })
     },
 
+    reconnect(){
+        socket.close()
+        socket.open()
+    },
+
+
     register(user){
-        return axios.post(`${apiPrefix}/register`,user);
+        return new Promise((resolve, reject) =>{
+            socket.emit("register", user, function (data) {
+                if (data.statusCode==406){
+                    console.log(data.msg);
+                    reject(data)
+                }
+                if (data.statusCode==200){
+                    resolve(data.result)
+                }
+              });  
+        })
     }
 
 }

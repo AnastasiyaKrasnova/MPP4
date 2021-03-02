@@ -47,6 +47,10 @@ class App extends React.Component{
 
     componentWillMount() {
         socket = socketIOClient(apiPrefix);
+        socket.on("auth", (err)=>{
+            console.log(err)
+            TaskActions.authError(err)
+        })
         TaskActions.loadTasks()
     }
 

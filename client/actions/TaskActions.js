@@ -3,6 +3,7 @@ import Constants from '../constants/AppConstants';
 
 import api from '../api';
 import download from 'js-file-download';
+import {Cookies} from "react-cookie";
 
 const TaskActions = {
     loadTasks() {
@@ -130,13 +131,17 @@ const TaskActions = {
 
     login(user){
         api.login(user)
-        .then(() =>
-        this.loadTasks()
+        .then((res) =>{
+            const cookies = new Cookies();
+            cookies.set('auth-token', res, {maxAge: 100});
+            api.reconnect()
+            this.loadTasks()
+        }
         )
         .catch(err => {
             AppDispatcher.dispatch({
                 type: Constants.LOAD_TASKS_FAIL,
-                error: err.response
+                error: err
             })
         });
     },
@@ -152,6 +157,13 @@ const TaskActions = {
                 error: err
             })
         });
+    }, 
+
+    authError(err){
+        AppDispatcher.dispatch({
+            type: Constants.LOAD_TASKS_FAIL,
+            error: err
+        })
     }
 };
 

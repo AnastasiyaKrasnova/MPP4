@@ -3,7 +3,7 @@ const Task=require('../controllers/tasks');
 const fs = require('fs');
 const path = require('path');
 var siofu = require("socketio-file-upload")
-const auth=require('../middleware/verifyToken')
+const Auth=require('../middleware/verifyToken')
 
 
 /*router.post('/tasks', auth, async (req,res)=>{
@@ -104,7 +104,6 @@ router.delete('/tasks', auth, async (req,res)=>{
 module.exports=router;*/
 
 exports.load_Tasks=(socket)=>{
-
      socket.on("load_tasks", function (callback) {
           console.log("Got It")
           Task.listAll()

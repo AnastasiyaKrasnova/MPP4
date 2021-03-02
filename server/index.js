@@ -9,6 +9,7 @@ const socketIo =require("socket.io")
 const http=require("http")
 var siofu = require("socketio-file-upload")
 const {serverPort} =require('../api_config.json');
+const Auth=require('../server/middleware/verifyToken')
 
 global.appRoot = path.resolve(__dirname);
 
@@ -43,6 +44,19 @@ app.get('/',(req, res) => {
 
 io.on("connection", socket => {
     console.log("New client connected");
+    socket.use((packet,next) => {
+       Auth.wsTokenVerify(socket,packet,next)
+    })
+    addListeners(socket)
+    socket.on("disconnect", () => console.log("Client disconnected"));
+});
+
+server.listen(serverPort, ()=>console.log('Server is running'));
+
+function addListeners(socket) {
+    users.login(socket)
+    users.register(socket)
+    users.unauthorized(socket)
     tasks.load_Tasks(socket)
     tasks.delete_Task(socket)
     tasks.create_Task(socket)
@@ -53,8 +67,4 @@ io.on("connection", socket => {
     tasks.upload_File(socket,uploader)
     tasks.download_File(socket)
     tasks.delete_File(socket)
-    socket.on("disconnect", () => console.log("Client disconnected"));
-});
-
-server.listen(serverPort, ()=>console.log('Server is running'));
-
+}
